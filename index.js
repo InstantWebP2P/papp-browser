@@ -18,6 +18,9 @@ var rl = readline.createInterface({
 });
 rl.on('line', function (usrkey) {
 	///console.log('You just typed: '+usrkey);
+	console.log('......');
+	
+	rl.close();
 
 	var prxySrv = new forwardProxy({
 		endpoints: [{ip: 'iwebpp.com', port: 51686}, {ip: 'iwebpp.com', port: 51868}],
@@ -25,6 +28,7 @@ rl.on('line', function (usrkey) {
 
 		usrkey: usrkey, 
 		secmode: 'acl', 
+		sslmode: 'srv',
 		access_local: false
 	}, function(err, proxy){
 		if (err || !proxy) {
