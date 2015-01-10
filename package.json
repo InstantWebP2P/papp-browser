@@ -1,0 +1,27 @@
+{
+  "author": "Tom Zhou (http://iwebpp.com)",
+  "name": "papp",
+  "description": "web browser for peer apps",
+  "version": "0.1.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/InstantWebP2P/papp-browser.git"
+  },
+  "keywords": [
+    "peer",
+    "webp2p",
+    "httpp",
+    "http",
+    "app"
+  ],
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "forward-proxy": "2.0.20",
+    "socks5": "0.2.x",
+    "request": "~2.27.0",
+    "freeport": "~1.0.4"
+  }
+}
