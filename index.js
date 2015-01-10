@@ -8,107 +8,119 @@ var os = require('os');
 
 
 var forwardProxy = require('forward-proxy');
-var prxySrv = new forwardProxy({
-       endpoints: [{ip: 'iwebpp.com', port: 51686}, {ip: 'iwebpp.com', port: 51868}],
-            turn: [{ip: 'iwebpp.com', agent: 51866, proxy: 51688}],
-            
-	      usrkey: 'input-user-key', 
-		 secmode: 'acl', 
-    access_local: false
-}, function(err, proxy){
-	if (err || !proxy) {
-		console.log(err+',create proxy failed');
-		return 
-	}
 
-	// turn on export service query timer
-	prxySrv.turnQuerytimer(true);
+// prompt user key
+var readline = require('readline');
 
-	var importApp = proxy.importApp;
+var rl = readline.createInterface({
+	input: process.stdin,
+	output: process.stdout
+});
+rl.on('line', function (usrkey) {
+	///console.log('You just typed: '+usrkey);
 
-	// 1.
-	// get free tcp port
-	freeport(function(err, prxyPort) {
-		if (err) throw new Error(err+', get proxy port failed');
+	var prxySrv = new forwardProxy({
+		endpoints: [{ip: 'iwebpp.com', port: 51686}, {ip: 'iwebpp.com', port: 51868}],
+		turn: [{ip: 'iwebpp.com', agent: 51866, proxy: 51688}],
 
-		// 2.
-		// start http proxy service
-		var pxySrv = http.createServer();
+		usrkey: usrkey, 
+		secmode: 'acl', 
+		access_local: false
+	}, function(err, proxy){
+		if (err || !proxy) {
+			console.log(err+',create proxy failed');
+			return 
+		}
 
-		pxySrv.on('request', importApp.httpApp.proxy);
-		pxySrv.on('connect', importApp.httpApp.tunnel);
+		// turn on export service query timer
+		prxySrv.turnQuerytimer(true);
 
-		pxySrv.listen(prxyPort);
-		console.log('Http forwar proxy server listen on port '+prxyPort);
+		var importApp = proxy.importApp;
 
-		freeport(function(err, scksPort) {
-			if (err) throw new Error(err+', get socks port failed');
+		// 1.
+		// get free tcp port
+		freeport(function(err, prxyPort) {
+			if (err) throw new Error(err+', get proxy port failed');
 
-			// 2.1
-			// start socks proxy service
-			var sockspxySrv = socks.createServer(importApp.socksApp);
+			// 2.
+			// start http proxy service
+			var pxySrv = http.createServer();
 
-			sockspxySrv.listen(scksPort);
+			pxySrv.on('request', importApp.httpApp.proxy);
+			pxySrv.on('connect', importApp.httpApp.tunnel);
 
-			sockspxySrv.on('error', function (e) {
-				console.error('SERVER ERROR: %j', e);
-			});
-			console.log('Socks forward proxy server listen on port '+scksPort);
+			pxySrv.listen(prxyPort);
+			console.log('Http forwar proxy server listen on port '+prxyPort);
 
-			// 3.
-			// start pac server
-			freeport(function(err, pacPort) {
-				if (err) throw new Error(err+', get pac port failed');
+			freeport(function(err, scksPort) {
+				if (err) throw new Error(err+', get socks port failed');
 
-				// pac server
-				var rawstr = fs.readFileSync(__dirname+'/auto.pac').toString('utf-8');
-				// fill http proxy server
-				var pacstr = rawstr.replace(/proxy_port/gi, ''+prxyPort);
-				pacstr = pacstr.replace(/socks_port/gi, ''+scksPort);
-				///console.log('pacstr: '+pacstr);
-				var pacsrv = http.createServer(function(req, res){
-					res.writeHead(200, {'Content-Type': 'application/x-ns-proxy-autoconfig'});
-					res.end(pacstr);
+				// 2.1
+				// start socks proxy service
+				var sockspxySrv = socks.createServer(importApp.socksApp);
+
+				sockspxySrv.listen(scksPort);
+
+				sockspxySrv.on('error', function (e) {
+					console.error('SERVER ERROR: %j', e);
 				});
+				console.log('Socks forward proxy server listen on port '+scksPort);
 
-				pacsrv.listen(pacPort);
-				console.log('pac server listening on '+pacPort);
+				// 3.
+				// start pac server
+				freeport(function(err, pacPort) {
+					if (err) throw new Error(err+', get pac port failed');
 
-				// 4.
-				// launching chrome browser with pac settings
-				var cli = '';
+					// pac server
+					var rawstr = fs.readFileSync(__dirname+'/auto.pac').toString('utf-8');
+					// fill http proxy server
+					var pacstr = rawstr.replace(/proxy_port/gi, ''+prxyPort);
+					pacstr = pacstr.replace(/socks_port/gi, ''+scksPort);
+					///console.log('pacstr: '+pacstr);
+					var pacsrv = http.createServer(function(req, res){
+						res.writeHead(200, {'Content-Type': 'application/x-ns-proxy-autoconfig'});
+						res.end(pacstr);
+					});
 
-				// 4.1
-				// check platform specific chromium binary path
-				var plt = os.platform();
-				var runtime;
+					pacsrv.listen(pacPort);
+					console.log('pac server listening on '+pacPort);
 
-				console.log('platform:'+plt);
-				if (plt.match('win32')) {
-					runtime = __dirname + '/front/windows/GoogleChromePortable/App/Chrome-bin/chrome.exe';
-				} else if (plt.match('darwin')) {
-					runtime = __dirname + '/front/mac/Chromium.app/Contents/MacOS/Chromium';
-				} else if (plt.match('linux')) {
-					runtime = __dirname + '/front/linux/ChromiumPortable/ChromiumPortable';
-				} else {
-					throw new Error('Not support platform');
-				}
+					// 4.
+					// launching chrome browser with pac settings
+					var cli = '';
 
-				cli  = '"' + runtime + '"';
-				cli += ' --proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"';
-				cli += ' --user-data-dir="' + __dirname + '/user-data/' + '"';
-				cli += ' --disable-translate';
+					// 4.1
+					// check platform specific chromium binary path
+					var plt = os.platform();
+					var runtime;
 
-				console.log("cli: "+cli);
-				child = exec(cli);
+					console.log('platform:'+plt);
+					if (plt.match('win32')) {
+						runtime = __dirname + '/front/windows/GoogleChromePortable/App/Chrome-bin/chrome.exe';
+					} else if (plt.match('darwin')) {
+						runtime = __dirname + '/front/mac/Chromium.app/Contents/MacOS/Chromium';
+					} else if (plt.match('linux')) {
+						runtime = __dirname + '/front/linux/ChromiumPortable/ChromiumPortable';
+					} else {
+						throw new Error('Not support platform');
+					}
 
-				child.on('exit', function(code){
-					console.log('child browser exited '+code);
-					// exit main program
-					process.exit(code);
+					cli  = '"' + runtime + '"';
+					cli += ' --proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"';
+					cli += ' --user-data-dir="' + __dirname + '/user-data/' + '"';
+					cli += ' --disable-translate';
+
+					console.log("cli: "+cli);
+					child = exec(cli);
+
+					child.on('exit', function(code){
+						console.log('child browser exited '+code);
+						// exit main program
+						process.exit(code);
+					});
 				});
 			});
 		});
 	});
 });
-
+console.log('Please enter your user key:');
