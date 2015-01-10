@@ -10,10 +10,10 @@ var os = require('os');
 
 var forwardProxy = require('forward-proxy');
 var prxySrv = new forwardProxy({
-       endpoints: [{ip: 'iwebvpn.com', port: 51686}, {ip: 'iwebvpn.com', port: 51868}],
-            turn: [{ip: 'iwebvpn.com', agent: 51866, proxy: 51688}],
+       endpoints: [{ip: 'iwebpp.com', port: 51686}, {ip: 'iwebpp.com', port: 51868}],
+            turn: [{ip: 'iwebpp.com', agent: 51866, proxy: 51688}],
             
-	      usrkey: 'unlockus', 
+	      usrkey: 'needuserkey', 
 		 secmode: 'acl', 
     access_local: false
 }, function(err, proxy){
