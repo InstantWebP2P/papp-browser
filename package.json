@@ -21,7 +21,6 @@
   "dependencies": {
     "forward-proxy": "2.0.20",
     "socks5": "0.2.x",
-    "request": "~2.27.0",
     "freeport": "~1.0.4"
   }
 }

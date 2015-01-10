@@ -1,5 +1,4 @@
 var exec = require('child_process').exec,
-	spawn = require('child_process').spawn,
     child;
 var http = require('http');
 var fs = require('fs');
@@ -10,10 +9,10 @@ var os = require('os');
 
 var forwardProxy = require('forward-proxy');
 var prxySrv = new forwardProxy({
-       endpoints: [{ip: 'iwebpp.com', port: 51686}, {ip: 'iwebpp.com', port: 51868}],
-            turn: [{ip: 'iwebpp.com', agent: 51866, proxy: 51688}],
+       endpoints: [{ip: 'iwebvpn.com', port: 51686}, {ip: 'iwebvpn.com', port: 51868}],
+            turn: [{ip: 'iwebvpn.com', agent: 51866, proxy: 51688}],
             
-	      usrkey: 'needuserkey', 
+	      usrkey: 'unlockus', 
 		 secmode: 'acl', 
     access_local: false
 }, function(err, proxy){
@@ -84,41 +83,24 @@ var prxySrv = new forwardProxy({
 				var plt = os.platform();
 				var runtime;
 
-				if (plt.match('win')) {
+				console.log('platform:'+plt);
+				if (plt.match('win32')) {
 					runtime = __dirname + '/front/windows/GoogleChromePortable/App/Chrome-bin/chrome.exe';
-
-					cli  = '"' + runtime + '"';
-					cli += ' --proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"';
-					cli += ' --user-data-dir="' + __dirname + '/user-data/' + '"';
-					cli += ' --disable-translate';
-					
-					console.log("cli: "+cli);
-					child = exec(cli);
-				} else if (plt.match(/mac/gi) || plt.match(/osx/gi)) {
+				} else if (plt.match('darwin')) {
 					runtime = __dirname + '/front/mac/Chromium.app/Contents/MacOS/Chromium';
-
-					var args = [
-					            '--proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"',
-					            '--user-data-dir="' + __dirname + '/user-data/' + '"',
-					            '--disable-translate'
-					            ];
-
-					console.log("cli: "+cli+", args:" + args.join(' '));
-					child = spawn(runtime, args);
 				} else if (plt.match('linux')) {
 					runtime = __dirname + '/front/linux/ChromiumPortable/ChromiumPortable';
-
-					var args = [
-					            '--proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"',
-					            '--user-data-dir="' + __dirname + '/user-data/' + '"',
-					            '--disable-translate'
-					            ];
-
-					console.log("cli: "+cli+", args:" + args.join(' '));
-					child = spawn(runtime, args);
 				} else {
 					throw new Error('Not support platform');
 				}
+
+				cli  = '"' + runtime + '"';
+				cli += ' --proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"';
+				cli += ' --user-data-dir="' + __dirname + '/user-data/' + '"';
+				cli += ' --disable-translate';
+
+				console.log("cli: "+cli);
+				child = exec(cli);
 
 				child.on('exit', function(code){
 					console.log('child browser exited '+code);
