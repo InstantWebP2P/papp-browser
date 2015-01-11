@@ -1192,16 +1192,16 @@ function FindProxyForURL(url, host) {
 
 		// ftp site prefer socks5 proxy
 		if (url.match("ftp:")) {
-			return "SOCKS5 127.0.0.1:socks_port";
+			return "SOCKS5 127.0.0.1:socks_port;";
 		}
 
-		// http site prefer socks5 proxy
-		if (url.match("http:")) {
+		// http/ws site prefer socks5 proxy
+		if (url.match("http:") || url.match("ws:")) {
 			return "SOCKS5 127.0.0.1:socks_port;PROXY 127.0.0.1:proxy_port;";
 		}
 
-		// https site prefer http proxy
-		if (url.match("https:")) {
+		// https/wss site prefer http proxy
+		if (url.match("https:") || url.match("wss:")) {
 			return "PROXY 127.0.0.1:proxy_port;SOCKS5 127.0.0.1:socks_port;";
 		}
 

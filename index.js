@@ -1,4 +1,5 @@
 var exec = require('child_process').exec,
+	fork = require('child_process').fork,
     child;
 var http = require('http');
 var fs = require('fs');
@@ -37,7 +38,7 @@ rl.on('line', function (usrkey) {
 		}
 
 		// turn on export service query timer
-		prxySrv.turnQuerytimer(true);
+		///prxySrv.turnQuerytimer(true);
 
 		var importApp = proxy.importApp;
 
@@ -75,6 +76,7 @@ rl.on('line', function (usrkey) {
 				freeport(function(err, pacPort) {
 					if (err) throw new Error(err+', get pac port failed');
 
+					
 					// pac server
 					var rawstr = fs.readFileSync(__dirname+'/auto.pac').toString('utf-8');
 					// fill http proxy server
@@ -89,6 +91,13 @@ rl.on('line', function (usrkey) {
 					pacsrv.listen(pacPort);
 					console.log('pac server listening on '+pacPort);
 
+					/*var pac = fork('./pac.js', [pacPort, prxyPort, scksPort]);
+					pac.on('exit', function(code){
+						console.log('pac server exited '+code);
+						// exit main program
+						process.exit(code);
+					});*/
+					
 					// 4.
 					// launching chrome browser with pac settings
 					var cli = '';
