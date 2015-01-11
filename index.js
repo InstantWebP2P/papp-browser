@@ -44,101 +44,101 @@ rl.on('line', function (userkey) {
 			} else {
 				console.log('%d available export services', Object.keys(srv).length);
 			}
-		});
-		
-		// turn on export service query timer
-		///prxySrv.turnQuerytimer(true);
 
-		var importApp = proxy.importApp;
+			// turn on export service query timer
+			prxySrv.turnQuerytimer(true);
 
-		// 1.
-		// get free tcp port
-		freeport(function(err, prxyPort) {
-			if (err) throw new Error(err+', get proxy port failed');
+			var importApp = proxy.importApp;
 
-			// 2.
-			// start http proxy service
-			var pxySrv = http.createServer();
+			// 1.
+			// get free tcp port
+			freeport(function(err, prxyPort) {
+				if (err) throw new Error(err+', get proxy port failed');
 
-			pxySrv.on('request', importApp.httpApp.proxy);
-			pxySrv.on('connect', importApp.httpApp.tunnel);
+				// 2.
+				// start http proxy service
+				var pxySrv = http.createServer();
 
-			pxySrv.listen(prxyPort, function() {
-				console.log('Http forwar proxy server listen on port '+prxyPort);
+				pxySrv.on('request', importApp.httpApp.proxy);
+				pxySrv.on('connect', importApp.httpApp.tunnel);
 
-				freeport(function(err, scksPort) {
-					if (err) throw new Error(err+', get socks port failed');
+				pxySrv.listen(prxyPort, function() {
+					console.log('Http forwar proxy server listen on port '+prxyPort);
 
-					// 2.1
-					// start socks proxy service
-					var sockspxySrv = socks.createServer(importApp.socksApp);
+					freeport(function(err, scksPort) {
+						if (err) throw new Error(err+', get socks port failed');
 
-					sockspxySrv.listen(scksPort, function() {
+						// 2.1
+						// start socks proxy service
+						var sockspxySrv = socks.createServer(importApp.socksApp);
 
-						sockspxySrv.on('error', function (e) {
-							console.error('SERVER ERROR: %j', e);
-						});
-						console.log('Socks forward proxy server listen on port '+scksPort);
+						sockspxySrv.listen(scksPort, function() {
 
-						// 3.
-						// start pac server
-						freeport(function(err, pacPort) {
-							if (err) throw new Error(err+', get pac port failed');
-
-
-							// pac server
-							var rawstr = fs.readFileSync(__dirname+'/auto.pac').toString('utf-8');
-							// fill http proxy server
-							var pacstr = rawstr.replace(/proxy_port/gi, ''+prxyPort);
-							pacstr = pacstr.replace(/socks_port/gi, ''+scksPort);
-							///console.log('pacstr: '+pacstr);
-							var pacsrv = http.createServer(function(req, res){
-								res.writeHead(200, {'Content-Type': 'application/x-ns-proxy-autoconfig'});
-								res.end(pacstr);
+							sockspxySrv.on('error', function (e) {
+								console.error('SERVER ERROR: %j', e);
 							});
+							console.log('Socks forward proxy server listen on port '+scksPort);
 
-							pacsrv.listen(pacPort, function() {
-								console.log('pac server listening on '+pacPort);
+							// 3.
+							// start pac server
+							freeport(function(err, pacPort) {
+								if (err) throw new Error(err+', get pac port failed');
 
-								/*var pac = fork('./pac.js', [pacPort, prxyPort, scksPort]);
+
+								// pac server
+								var rawstr = fs.readFileSync(__dirname+'/auto.pac').toString('utf-8');
+								// fill http proxy server
+								var pacstr = rawstr.replace(/proxy_port/gi, ''+prxyPort);
+								pacstr = pacstr.replace(/socks_port/gi, ''+scksPort);
+								///console.log('pacstr: '+pacstr);
+								var pacsrv = http.createServer(function(req, res){
+									res.writeHead(200, {'Content-Type': 'application/x-ns-proxy-autoconfig'});
+									res.end(pacstr);
+								});
+
+								pacsrv.listen(pacPort, function() {
+									console.log('pac server listening on '+pacPort);
+
+									/*var pac = fork('./pac.js', [pacPort, prxyPort, scksPort]);
 					pac.on('exit', function(code){
 						console.log('pac server exited '+code);
 						// exit main program
 						process.exit(code);
 					});*/
 
-								// 4.
-								// launching chrome browser with pac settings
-								var cli = '';
+									// 4.
+									// launching chrome browser with pac settings
+									var cli = '';
 
-								// 4.1
-								// check platform specific chromium binary path
-								var plt = os.platform();
-								var runtime;
+									// 4.1
+									// check platform specific chromium binary path
+									var plt = os.platform();
+									var runtime;
 
-								console.log('platform:'+plt);
-								if (plt.match('win32')) {
-									runtime = __dirname + '/front/windows/GoogleChromePortable/App/Chrome-bin/chrome.exe';
-								} else if (plt.match('darwin')) {
-									runtime = __dirname + '/front/mac/Chromium.app/Contents/MacOS/Chromium';
-								} else if (plt.match('linux')) {
-									runtime = __dirname + '/front/linux/ChromiumPortable/ChromiumPortable';
-								} else {
-									throw new Error('Not support platform');
-								}
+									console.log('platform:'+plt);
+									if (plt.match('win32')) {
+										runtime = __dirname + '/front/windows/GoogleChromePortable/App/Chrome-bin/chrome.exe';
+									} else if (plt.match('darwin')) {
+										runtime = __dirname + '/front/mac/Chromium.app/Contents/MacOS/Chromium';
+									} else if (plt.match('linux')) {
+										runtime = __dirname + '/front/linux/ChromiumPortable/ChromiumPortable';
+									} else {
+										throw new Error('Not support platform');
+									}
 
-								cli  = '"' + runtime + '"';
-								cli += ' --proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"';
-								cli += ' --user-data-dir="' + __dirname + '/user-data/' + '"';
-								cli += ' --disable-translate';
+									cli  = '"' + runtime + '"';
+									cli += ' --proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"';
+									cli += ' --user-data-dir="' + __dirname + '/user-data/' + '"';
+									cli += ' --disable-translate';
 
-								console.log("cli: "+cli);
-								child = exec(cli);
+									console.log("cli: "+cli);
+									child = exec(cli);
 
-								child.on('exit', function(code){
-									console.log('child browser exited '+code);
-									// exit main program
-									process.exit(code);
+									child.on('exit', function(code){
+										console.log('child browser exited '+code);
+										// exit main program
+										process.exit(code);
+									});
 								});
 							});
 						});
