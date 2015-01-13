@@ -18,7 +18,7 @@ var rl = readline.createInterface({
 	output: process.stdout
 });
 
-rl.question('Please enter your user key(请输入密码):', function(answer) {
+rl.question('Please enter your user key:', function(answer) {
 	var userkey = answer && answer.trim();
 	
 	///console.log('You just typed: '+userkey);
