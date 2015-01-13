@@ -17,7 +17,10 @@ var rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout
 });
-rl.on('line', function (userkey) {
+
+rl.question('What is your user key?', function(answer) {
+	var userkey = answer && answer.trim();
+	
 	///console.log('You just typed: '+userkey);
 	console.log('......');
 
@@ -148,4 +151,3 @@ rl.on('line', function (userkey) {
 		});
 	});
 });
-console.log('Please enter your user key:');
