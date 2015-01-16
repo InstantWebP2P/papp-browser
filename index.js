@@ -21,8 +21,8 @@ var rl = readline.createInterface({
 rl.question('Please enter your user key:', function(answer) {
 	var userkey = answer && answer.trim();
 	
-	///console.log('You just typed: '+userkey);
-	console.log('......');
+	console.log('You just typed: '+userkey);
+	console.log('\nPlease waiting seconds and Chrome will show up ...... \n');
 
 	rl.close();
 
