@@ -1,3 +1,8 @@
+/* papp browser for peer apps
+ * Copyright(c) 2015 Tom Zhou <iwebpp@gmail.com>
+ * MIT Licensed
+ */
+
 var exec = require('child_process').exec,
 	fork = require('child_process').fork,
     child;

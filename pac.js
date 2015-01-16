@@ -1,3 +1,7 @@
+/* Copyright(c) 2015 Tom Zhou <iwebpp@gmail.com>
+ * MIT Licensed
+ */
+
 var http = require('http');
 var fs = require('fs');
 
