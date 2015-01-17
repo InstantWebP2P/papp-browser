@@ -19,7 +19,7 @@
   },
   "main": "index.js",
   "dependencies": {
-    "forward-proxy": "2.0.20",
+    "forward-proxy": "2.1.1",
     "socks5": "0.2.x",
     "freeport": "~1.0.4"
   }
