@@ -21,14 +21,14 @@ var rl = readline.createInterface({
 rl.question('Please enter your user key:', function(answer) {
 	var userkey = answer && answer.trim();
 	
-	///console.log('You just typed: '+userkey);
-	console.log('......');
+	console.log('You just typed: '+userkey);
+	console.log('\nPlease waiting seconds and Chrome will show up ......\n');
 
 	rl.close();
 
 	var prxySrv = new forwardProxy({
-		endpoints: [{ip: 'iwebpp.com', port: 51686}, {ip: 'iwebpp.com', port: 51868}],
-		turn: [{ip: 'iwebpp.com', agent: 51866, proxy: 51688}],
+		endpoints: [{ip: 'iwebvpn.com', port: 51686}, {ip: 'iwebvpn.com', port: 51868}],
+		turn: [{ip: 'iwebvpn.com', agent: 51866, proxy: 51688}],
 
 		usrkey: userkey, 
 		secmode: 'acl', 
@@ -93,6 +93,13 @@ rl.question('Please enter your user key:', function(answer) {
 								// fill http proxy server
 								var pacstr = rawstr.replace(/proxy_port/gi, ''+prxyPort);
 								pacstr = pacstr.replace(/socks_port/gi, ''+scksPort);
+								// check if CN site
+								var isCN = prxySrv.nmcln.geoip && prxySrv.nmcln.geoip.country === 'CN';
+								if (isCN) {
+									pacstr = pacstr.replace(/isCN/gi, '');
+								} else {
+									pacstr = pacstr.replace(/isCN/gi, '!');
+								}
 								///console.log('pacstr: '+pacstr);
 								var pacsrv = http.createServer(function(req, res){
 									res.writeHead(200, {'Content-Type': 'application/x-ns-proxy-autoconfig'});
@@ -102,7 +109,7 @@ rl.question('Please enter your user key:', function(answer) {
 								pacsrv.listen(pacPort, function() {
 									console.log('pac server listening on '+pacPort);
 
-									/*var pac = fork('./pac.js', [pacPort, prxyPort, scksPort]);
+									/*var pac = fork('./pac.js', [pacPort, prxyPort, scksPort, isCN]);
 					pac.on('exit', function(code){
 						console.log('pac server exited '+code);
 						// exit main program

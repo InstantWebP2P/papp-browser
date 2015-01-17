@@ -1172,8 +1172,8 @@ function FindProxyForURL(url, host) {
 		return false;
 	}
 
-	// skip china sites
-	if (rule_filter(isDomain)) {
+	// check china sites
+	if (isCN(rule_filter(isDomain))) {
 		return "DIRECT";
 	} else {
 		// if none of above cases, it is always safe to use the proxy
