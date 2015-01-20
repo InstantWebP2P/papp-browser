@@ -110,11 +110,11 @@ rl.question('Please enter your user key:', function(answer) {
 									console.log('pac server listening on '+pacPort);
 
 									/*var pac = fork('./pac.js', [pacPort, prxyPort, scksPort, isCN]);
-					pac.on('exit', function(code){
-						console.log('pac server exited '+code);
-						// exit main program
-						process.exit(code);
-					});*/
+									pac.on('exit', function(code){
+										console.log('pac server exited '+code);
+										// exit main program
+										process.exit(code);
+									});*/
 
 									// 4.
 									// launching chrome browser with pac settings
@@ -140,6 +140,7 @@ rl.question('Please enter your user key:', function(answer) {
 									cli += ' --proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"';
 									cli += ' --user-data-dir="' + __dirname + '/user-data/' + '"';
 									cli += ' --disable-translate';
+
 
 									console.log("cli: "+cli);
 									child = exec(cli);
