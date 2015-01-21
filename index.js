@@ -14,6 +14,7 @@ var os = require('os');
 
 
 var forwardProxy = require('forward-proxy');
+var httppForward = require('httpp-forward');
 
 // prompt user key
 var readline = require('readline');
@@ -71,7 +72,7 @@ rl.question('Please enter your user key:', function(answer) {
 				pxySrv.on('connect', importApp.httpApp.tunnel);
 
 				pxySrv.listen(prxyPort, function() {
-					console.log('Http forwar proxy server listen on port '+prxyPort);
+					console.log('Http proxy server listen on port '+prxyPort);
 
 					freeport(function(err, scksPort) {
 						if (err) throw new Error(err+', get socks port failed');
@@ -85,70 +86,115 @@ rl.question('Please enter your user key:', function(answer) {
 							sockspxySrv.on('error', function (e) {
 								console.error('SERVER ERROR: %j', e);
 							});
-							console.log('Socks forward proxy server listen on port '+scksPort);
+							console.log('Socks proxy server listen on port '+scksPort);
 
 							// 3.
-							// start pac server
-							freeport(function(err, pacPort) {
-								if (err) throw new Error(err+', get pac port failed');
+							// start httpp-forward proxy server for httpp enabled sites
+							var httppPrxy = new httppForward(function(err, proxy1){
+							    if (err || !proxy1) {
+							        console.log(err+',create httpp forward proxy failed');
+							        return 
+							    }
+
+							    // 3.1
+							    // start http forward proxy service
+							    freeport(function(err, prxyPort1) {
+							    	if (err) throw new Error(err+', get httpp proxy port failed');
+
+							    	var pxySrv1 = http.createServer();
+
+							    	pxySrv1.on('request', proxy1.httpProxy);
+							    	pxySrv1.on('connect', proxy1.httpTunnel);
+
+							    	pxySrv1.listen(prxyPort1, function() {
+							    		console.log('Httpp-forward proxy server listen on port '+prxyPort1);
+
+							    		// 3.2
+							    		// start httpp socks forward proxy service
+							    		freeport(function(err, scksPort1) {
+							    			if (err) throw new Error(err+', get httpp socks port failed');
+
+							    			var sockspxySrv1 = socks.createServer(proxy1.socksProxy);
+
+							    			sockspxySrv1.listen(scksPort1, function() {
+							    				sockspxySrv1.on('error', function (e) {
+							    					console.error('httpp SERVER ERROR: %j', e);
+							    				});
+							    				console.log('Httpp-forward socks server listen on port '+scksPort1);
+
+							    				// 5.
+							    				// start pac server
+							    				freeport(function(err, pacPort) {
+							    					if (err) throw new Error(err+', get pac port failed');
 
 
-								// pac server
-								var rawstr = fs.readFileSync(__dirname+'/auto.pac').toString('utf-8');
-								// fill http proxy server
-								var pacstr = rawstr.replace(/proxy_port/gi, ''+prxyPort);
-								pacstr = pacstr.replace(/socks_port/gi, ''+scksPort);
-								///console.log('pacstr: '+pacstr);
-								var pacsrv = http.createServer(function(req, res){
-									res.writeHead(200, {'Content-Type': 'application/x-ns-proxy-autoconfig'});
-									res.end(pacstr);
-								});
+							    					// pac server
+							    					var rawstr = fs.readFileSync(__dirname+'/auto.pac').toString('utf-8');
+							    					
+							    					// fill http proxy server
+							    					var pacstr = rawstr.replace(/proxy_port/gi, ''+prxyPort);
+							    					pacstr = pacstr.replace(/socks_port/gi, ''+scksPort);
+							    					
+							    					// fill httpp-forward server
+							    					pacstr = pacstr.replace(/proxy_httpp_port/gi, ''+prxyPort1);
+							    					pacstr = pacstr.replace(/socks_httpp_port/gi, ''+scksPort1);
+							    					
+							    					///console.log('pacstr: '+pacstr);
+							    					var pacsrv = http.createServer(function(req, res){
+							    						res.writeHead(200, {'Content-Type': 'application/x-ns-proxy-autoconfig'});
+							    						res.end(pacstr);
+							    					});
 
-								pacsrv.listen(pacPort, function() {
-									console.log('pac server listening on '+pacPort);
+							    					pacsrv.listen(pacPort, function() {
+							    						console.log('pac server listening on '+pacPort);
 
-									/*var pac = fork('./pac.js', [pacPort, prxyPort, scksPort]);
-					pac.on('exit', function(code){
-						console.log('pac server exited '+code);
-						// exit main program
-						process.exit(code);
-					});*/
+							    						/*var pac = fork('./pac.js', [pacPort, prxyPort, scksPort, prxyPort1, scksPort1]);
+							    								pac.on('exit', function(code){
+							    									console.log('pac server exited '+code);
+							    									// exit main program
+							    									process.exit(code);
+							    								});*/
 
-									// 4.
-									// launching chrome browser with pac settings
-									var cli = '';
+							    						// 6.
+							    						// launching chrome browser with pac settings
+							    						var cli = '';
 
-									// 4.1
-									// check platform specific chromium binary path
-									var plt = os.platform();
-									var runtime;
+							    						// 6.1
+							    						// check platform specific chromium binary path
+							    						var plt = os.platform();
+							    						var runtime;
 
-									console.log('platform:'+plt);
-									if (plt.match('win32')) {
-										runtime = __dirname + '/front/windows/GoogleChromePortable/App/Chrome-bin/chrome.exe';
-									} else if (plt.match('darwin')) {
-										runtime = __dirname + '/front/mac/Chromium.app/Contents/MacOS/Chromium';
-									} else if (plt.match('linux')) {
-										runtime = __dirname + '/front/linux/ChromiumPortable/ChromiumPortable';
-									} else {
-										throw new Error('Not support platform');
-									}
+							    						console.log('platform:'+plt);
+							    						if (plt.match('win32')) {
+							    							runtime = __dirname + '/front/windows/GoogleChromePortable/App/Chrome-bin/chrome.exe';
+							    						} else if (plt.match('darwin')) {
+							    							runtime = __dirname + '/front/mac/Chromium.app/Contents/MacOS/Chromium';
+							    						} else if (plt.match('linux')) {
+							    							runtime = __dirname + '/front/linux/ChromiumPortable/ChromiumPortable';
+							    						} else {
+							    							throw new Error('Not support platform');
+							    						}
 
-									cli  = '"' + runtime + '"';
-									cli += ' --proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"';
-									cli += ' --user-data-dir="' + __dirname + '/user-data/' + '"';
-									cli += ' --disable-translate';
+							    						cli  = '"' + runtime + '"';
+							    						cli += ' --proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"';
+							    						cli += ' --user-data-dir="' + __dirname + '/user-data/' + '"';
+							    						cli += ' --disable-translate';
 
-									console.log("cli: "+cli);
-									child = exec(cli);
+							    						console.log("cli: "+cli);
+							    						child = exec(cli);
 
-									child.on('exit', function(code){
-										console.log('child browser exited '+code);
-										// exit main program
-										process.exit(code);
-									});
-								});
-							});
+							    						child.on('exit', function(code){
+							    							console.log('child browser exited '+code);
+							    							// exit main program
+							    							process.exit(code);
+							    						});
+							    					});
+							    				});
+							    			});
+							    		});
+							    	});
+							    });
+							});													
 						});
 					});
 				});

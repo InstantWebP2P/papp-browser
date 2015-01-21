@@ -20,7 +20,8 @@
   "main": "index.js",
   "dependencies": {
     "forward-proxy": "2.0.20",
-    "socks5": "0.2.x",
-    "freeport": "~1.0.4"
+    "freeport": "~1.0.4",
+    "httpp-forward": "1.0.2",
+    "socks5": "0.2.x"
   }
 }
