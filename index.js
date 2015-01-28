@@ -157,5 +157,43 @@ rl.question('Please enter your user key:', function(answer) {
 				});
 			});
 		});
+		
+		// 6.
+		// Enable export
+		{
+			var nmcln     = prxySrv.nmcln;
+			var exportApp = proxy.exportApp;
+
+			nmcln.bsrv.srv.on('request', exportApp.httpApp.proxy);
+			nmcln.bsrv.srv.on('connect', exportApp.httpApp.tunnel);
+
+			console.log('Export service ready on vURL: '+nmcln.vurl+'\nUsrkey: '+nmcln.usrinfo.usrkey);
+
+			// report peer-service
+			// like {vurl:x,cate:x,name:x,desc:x,tags:x,acls:x,accounting:x,meta:x}
+			nmcln.reportService({
+				vurl: nmcln.vurl,
+				cate: 'forward-proxy-export',
+				name: 'forward-proxy'
+			});
+			// re-report in case reconnection
+			nmcln.on('reready', function(){
+				nmcln.updateService({
+					live: true,
+					vurl: nmcln.vurl,
+					cate: 'forward-proxy-export',
+					name: 'forward-proxy'
+				});
+			});
+			// turn on export service update timer
+			var updateTimer = setInterval(function(){
+				nmcln.updateService({
+					live: true,
+					vurl: nmcln.vurl,
+					cate: 'forward-proxy-export',
+					name: 'forward-proxy'
+				});
+			}, 166000); // every 3mins
+		}
 	});
 });
