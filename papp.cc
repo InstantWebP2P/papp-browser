@@ -14,9 +14,9 @@ int main(int argc, char * argv[]) {
 #if defined(WIN32) || defined(_WIN32)
 	_execl("./back/bin/windows/node.exe", "./back/bin/windows/node.exe", "./index.js", NULL);
 #elif defined(__APPLE__)
-	execl("./back/bin/mac/node", "./index.js", NULL);
+	execl("./back/bin/mac/node", "./back/bin/mac/node", "./index.js", NULL);
 #else
-	execl("./back/bin/linux32/node", "./index.js", NULL);
+	execl("./back/bin/linux32/node", "./back/bin/linux32/node", "./index.js", NULL);
 #endif
 
 	perror("PAPP browser execute failed");
