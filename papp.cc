@@ -20,7 +20,7 @@ int main(int argc, char * argv[]) {
 #endif
 
 	perror("PAPP browser execute failed");
-	printf("You can send email to iwebpp@gmail.com for support ...\n\n");
+	printf("You can send failure info by email to iwebpp@gmail.com for support ...\n\n");
 
 	return -1;
 }
