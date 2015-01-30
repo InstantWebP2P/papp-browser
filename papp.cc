@@ -1,3 +1,8 @@
+/*
+* PAPP browser 
+* Copyright(2014-2015) by tom zhou, iwebpp@gmail.com. All Rights Reserved.
+*/
+
 #include <stdio.h>
 #include <errno.h>
 
@@ -8,8 +13,7 @@
 #endif
 
 int main(int argc, char * argv[]) {
-	printf("Make friends with PAPP Browser!\n"
-		   "Copyright(2014-2015) by iwebpp@gmail.com. All Rights Reserved.\n\n");
+	printf("Make friends with PAPP Browser!\n\n");
 
 #if defined(WIN32) || defined(_WIN32)
 	_execl("./back/bin/windows/node.exe", "./back/bin/windows/node.exe", "./index.js", NULL);
