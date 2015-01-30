@@ -15,6 +15,14 @@ Web browser for peer apps
 
 * for linux user, double click on start_linux.sh or execute it on terminal window
 
+### Launch papp browser with executable
+
+* for windows user, double click on papp.exe
+
+* for mac user, double click on papp.app
+
+* for linux user, double click on papp
+
 ### then, input your user key,
 
 ### then, google chrome browser will show up
