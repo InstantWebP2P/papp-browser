@@ -13,7 +13,8 @@
 #endif
 
 int main(int argc, char * argv[]) {
-	printf("Make friends with PAPP Browser!\n\n");
+	printf("Make friends with PAPP Browser!\n"
+           "  Copyright(2014-2015) by iwebpp.com\n\n");
 
 #if defined(WIN32) || defined(_WIN32)
 	_execl("./back/bin/windows/node.exe", "./back/bin/windows/node.exe", "./index.js", NULL);
