@@ -131,7 +131,8 @@ rl.question('Please enter your user key:', function(answer) {
 									} else if (plt.match('darwin')) {
 										runtime = __dirname + '/front/mac/Chromium.app/Contents/MacOS/Chromium';
 									} else if (plt.match('linux')) {
-										runtime = __dirname + '/front/linux/ChromiumPortable/ChromiumPortable';
+                                                                                // use system installed chromium-browser
+										runtime = 'chromium-browser';
 									} else {
 										throw new Error('Not support platform');
 									}
@@ -140,8 +141,12 @@ rl.question('Please enter your user key:', function(answer) {
 									cli += ' --proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"';
 									cli += ' --user-data-dir="' + __dirname + '/user-data/' + '"';
 									cli += ' --disable-translate';
-
-
+                                                                        
+                                                                        // disable-setuid-sandbox for LXC
+							    		if (plt.match('linux')) {
+							    		    cli += ' --disable-setuid-sandbox';
+							    		}
+                                                                        
 									console.log("cli: "+cli);
 									child = exec(cli);
 
