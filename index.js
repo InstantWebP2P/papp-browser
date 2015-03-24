@@ -172,7 +172,7 @@ rl.question('Please enter your user key:', function(answer) {
 							    						} else if (plt.match('linux')) {
 							    							// use system install chromium-browser, disable-setuid-sandbox for LXC
 							    							///runtime = __dirname + '/front/linux/ChromiumPortable/ChromiumPortable';
-							    							runtime = 'chromium-browser --disable-setuid-sandbox ';
+							    							runtime = 'chromium-browser';
 							    						} else {
 							    							throw new Error('Not support platform');
 							    						}
@@ -181,6 +181,11 @@ rl.question('Please enter your user key:', function(answer) {
 							    						cli += ' --proxy-pac-url="http://localhost:'+pacPort+'/auto.pac"';
 							    						cli += ' --user-data-dir="' + __dirname + '/user-data/' + '"';
 							    						cli += ' --disable-translate';
+
+                                                                                                        // disable-setuid-sanbox for LXC        
+                                                                                                        if (plt.match('linux')) {
+                                                                                                            cli += ' --disable-setuid-sandbox';
+                                                                                                        }
 
 							    						console.log("cli: "+cli);
 							    						child = exec(cli);
