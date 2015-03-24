@@ -170,7 +170,9 @@ rl.question('Please enter your user key:', function(answer) {
 							    						} else if (plt.match('darwin')) {
 							    							runtime = __dirname + '/front/mac/Chromium.app/Contents/MacOS/Chromium';
 							    						} else if (plt.match('linux')) {
-							    							runtime = __dirname + '/front/linux/ChromiumPortable/ChromiumPortable';
+							    							// use system install chromium-browser, disable-setuid-sandbox for LXC
+							    							///runtime = __dirname + '/front/linux/ChromiumPortable/ChromiumPortable';
+							    							runtime = 'chromium-browser --disable-setuid-sandbox ';
 							    						} else {
 							    							throw new Error('Not support platform');
 							    						}
