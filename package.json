@@ -2,10 +2,13 @@
   "author": "Tom Zhou (http://iwebpp.com)",
   "name": "papp-browser",
   "description": "web browser for peer apps",
-  "version": "0.2.0",
+  "version": "0.3.2",
   "repository": {
     "type": "git",
     "url": "git://github.com/InstantWebP2P/papp-browser.git"
+  },
+  "scripts": {
+    "install": "(node-gyp rebuild 2> builderror.log) || (exit 0)"
   },
   "keywords": [
     "peer",
@@ -23,5 +26,6 @@
     "freeport": "~1.0.4",
     "httpp-forward": "1.0.2",
     "socks5": "0.2.x"
-  }
+  },
+  "gypfile": true
 }

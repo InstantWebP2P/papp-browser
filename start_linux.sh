@@ -4,4 +4,4 @@
 
 echo Make friends with PAPP Browser!
 
-./back/bin/linux/node index.js
+./back/bin/linux64/node index.js
