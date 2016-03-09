@@ -95,10 +95,11 @@ rl.question('Please enter your user key:', function(answer) {
 								pacstr = pacstr.replace(/socks_port/gi, ''+scksPort);
 								// check if CN site
 								var isCN = prxySrv.nmcln.geoip && prxySrv.nmcln.geoip.country === 'CN';
-								if (isCN) {
-									pacstr = pacstr.replace(/isCN/gi, '');
+								console.log('isCN:'+isCN);
+                                                                if (isCN) {
+									pacstr = pacstr.replace(/isCN/g, '');
 								} else {
-									pacstr = pacstr.replace(/isCN/gi, '!');
+									pacstr = pacstr.replace(/isCN/g, '!');
 								}
 								///console.log('pacstr: '+pacstr);
 								var pacsrv = http.createServer(function(req, res){
