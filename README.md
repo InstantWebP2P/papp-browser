@@ -4,7 +4,7 @@ Web browser for peer apps
 ### features
 
 * Support Access to iWebPP.io peer web service in STUN style instead of TURN
-* Suppport Access to HTTPP(http over udp) enabled web sites
+* Support Access to HTTPP(http over udp) enabled web sites
 * Secure end to end connection
 
 ### launch browser

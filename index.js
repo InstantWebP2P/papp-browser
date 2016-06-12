@@ -38,8 +38,8 @@ rl.question('Please enter your user key:', function(answer) {
 
 		usrkey: userkey, 
 		secmode: 'acl', 
-		sslmode: 'srv',
-		access_local: false
+		sslmode: 'srv', // only authenticate server
+		access_local: true // allow acces to local export
 	}, function(err, proxy){
 		if (err || !proxy) {
 			console.log(err+',create proxy failed');
