@@ -1,7 +1,7 @@
 {
   "name": "Papp-browser",
   "tagline": "Web browser for peer apps",
-  "body": "# papp-browser\r\nWeb browser for peer apps\r\n\r\n### launch browser\r\n\r\n* for windows user, double click on start_win.bat\r\n\r\n* for mac user, double click on start_mac.sh or execute it on terminal window\r\n\r\n* for linux user, double click on start_linux.sh or execute it on terminal window\r\n\r\n### then, input your user key,\r\n\r\n### then, google chrome browser will show up\r\n\r\n\r\n### MIT license, copyright@tom zhou, iwebpp@gmail.com\r\n\r\n\r\n",
+  "body": "# papp-browser\r\nWeb browser for peer apps\r\n\r\n### features\r\n\r\n* Support Access to iWebPP.io peer web service in STUN style instead of TURN\r\n* Support Access to HTTPP(http over udp) enabled web sites\r\n* Secure end to end connection\r\n\r\n### launch browser\r\n\r\n* for windows user, double click on start_win.bat\r\n\r\n* for mac user, double click on start_mac.sh or execute it on terminal window\r\n\r\n* for linux user, double click on start_linux.sh or execute it on terminal window\r\n\r\n### Launch papp browser with executable\r\n\r\n* for windows user, double click on papp.exe\r\n\r\n* for mac user, double click on papp.app\r\n\r\n* for linux user, double click on papp\r\n\r\n### then, input your user key,\r\n\r\n### then, google chrome browser will show up\r\n\r\n\r\n### MIT license, copyright@tom zhou, iwebpp@gmail.com\r\n\r\n\r\n",
   "google": "",
   "note": "Don't delete this file! It's used internally to help with page regeneration."
 }
