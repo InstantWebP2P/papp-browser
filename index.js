@@ -4,7 +4,7 @@
  */
 
 var exec = require('child_process').exec,
-	fork = require('child_process').fork,
+    fork = require('child_process').fork,
     child;
 var http = require('http');
 var fs = require('fs');
@@ -188,13 +188,16 @@ rl.question('Please enter your user key:', function(answer) {
 							    						}
 
 							    						console.log("cli: "+cli);
-							    						child = exec(cli);
+													setTimeout(function(){
+													    child = exec(cli);
 
-							    						child.on('exit', function(code){
-							    							console.log('child browser exited '+code);
+			                                                                                    child.on('exit', function(code){
+							    					                console.log('child browser exited '+code);
 							    							// exit main program
 							    							process.exit(code);
-							    						});
+							    						    });
+													}, 3000); // delay 3s start web browser
+							    						
 							    					});
 							    				});
 							    			});
