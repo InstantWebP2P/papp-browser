@@ -28,6 +28,7 @@ Web browser for peer apps
 ### then, google chrome browser will show up
 
 
-### MIT license, copyright@tom zhou, iwebpp@gmail.com
+### MIT license
+Copyright (c) 2015-2017 Tom Zhou(iwebpp@gmail.com)
 
 
